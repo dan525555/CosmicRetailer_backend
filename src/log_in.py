@@ -28,9 +28,10 @@ def load_user(id):
 
 @app.route("/login", methods=["POST"])
 def login():
-    name = request.form["name"]
+    name = request.form["nickname"]
     password = request.form["password"]
-    x = users_db.find_one({"name": name})
+    x = users_db.find_one({"nickname": name})
+    print("X:", x)
     if password == x["password"]:
         user = User(x["_id"])
         fl.login_user(user)
@@ -42,26 +43,31 @@ def login():
 @app.route("/register", methods=["POST"])
 def register():
     email = request.form["email"]
-    name = request.form["name"]
+    name = request.form["nickname"]
     password = request.form["password"]
 
-    if users_db.find_one({"name": name}) != None:
-        return jsonify({"message": "This nickname is already in use", "code": 418})
-    if not re.fullmatch(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", email):
-        return jsonify({"message": "This is not a proper email addess", "code": 418})
+    if users_db.find_one({"nickname": name}) != None:
+        return jsonify(
+            {"message": "This nickname is already in use", "code": 418}
+        )
+    if not re.fullmatch(
+        r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", email
+    ):
+        return jsonify(
+            {"message": "This is not a proper email addess", "code": 418}
+        )
     if users_db.find_one({"email": email}) != None:
         return jsonify({"message": "This email is already in use", "code": 418})
 
     users_db.insert_one(
         {
             "email": email,
-            "name": name,
+            "nickname": name,
             "password": password,
             "admin": False,
         }
     )
-    x = users_db.find_one({"name": name})
-    logs_db.insert_one({"_id": x["logs_id"]})
+    x = users_db.find_one({"nickname": name})
     user = User(x["_id"])
     fl.login_user(user)
     logged_users.add(user)

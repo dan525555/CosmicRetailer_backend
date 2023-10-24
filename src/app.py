@@ -1,14 +1,24 @@
 from flask import Flask
 from flask_cors import CORS
-import json  # rationale: for reading config.json file
-import pymongo  # rationale:
+import json
+import pymongo
 
 app = Flask(__name__)
+app.secret_key = 'super_secret_key'
 CORS(app, supports_credentials=True)
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (("http://localhost:5173", "http://localhost:5000"),)
-app.config.from_file("config.json", load=json.load)
+
+with open('config.json') as config_file:
+    config_data = json.load(config_file)
+
+app.config.update(config_data)
+
 mongo_client = pymongo.MongoClient(app.config["MONGO_API"])
+print(mongo_client.server_info())
+
+print('Available collections:')
+print(mongo_client["data"].list_collection_names())
 users_db = mongo_client["data"]["users"]
 
 # rationale for that kind of imports:
