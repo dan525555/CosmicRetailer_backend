@@ -20,3 +20,4 @@ users_db = mongo_client["data"]["users"]
 # rationale for that kind of imports:
 # https://stackoverflow.com/questions/11994325/how-to-divide-flask-app-into-multiple-py-files
 import log_in as log_in
+import item as item

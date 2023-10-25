@@ -4,7 +4,7 @@ from flask import request, jsonify
 import flask_login as fl
 from bson.objectid import ObjectId
 from re import fullmatch
-from jwt import encode, decode, ExpiredSignatureError
+from jwt import encode
 from passlib.hash import pbkdf2_sha256
 
 # login part
@@ -12,13 +12,11 @@ login_manager = fl.LoginManager()
 login_manager.init_app(app)
 logged_users = set()
 
-
 # user class
 class User(fl.UserMixin):
     def __init__(self, name) -> None:
         super().__init__()
         self.id = name
-
 
 @login_manager.user_loader
 def load_user(id):
