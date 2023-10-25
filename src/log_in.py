@@ -98,7 +98,7 @@ def register():
     x = users_db.find_one({"nickname": name})
     user = User(x["_id"])
     fl.login_user(user)
-    return "Success", 200
+    return jsonify({"access_token": token, "message": "Success"}), 200
 
 
 @app.route("/logout", methods=["POST"])
