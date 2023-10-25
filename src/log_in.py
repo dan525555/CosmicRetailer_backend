@@ -2,7 +2,9 @@ from app import app, users_db
 from flask import request, jsonify
 import flask_login as fl
 from bson.objectid import ObjectId
-import re  # regex
+from re import fullmatch
+from jwt import encode, decode, ExpiredSignatureError
+from passlib.hash import pbkdf2_sha256
 
 # login part
 login_manager = fl.LoginManager()
@@ -31,11 +33,21 @@ def login():
     name = request.form["nickname"]
     password = request.form["password"]
     x = users_db.find_one({"nickname": name})
-    if password == x["password"]:
+
+    if x and pbkdf2_sha256.verify(password, x["password"]):
         user = User(x["_id"])
         fl.login_user(user)
+
+        # Generate a JWT token
+        token = encode(
+            {"user_id": str(x["_id"])},
+            app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+
         logged_users.add(user)
-        return "Success", 200
+        return jsonify({"access_token": token, "message": "Success"}), 200
+
     return jsonify({"message": "Incorrect password or login", "code": 418})
 
 
@@ -45,31 +57,38 @@ def register():
     name = request.form["nickname"]
     password = request.form["password"]
 
-    if users_db.find_one({"nickname": name}) != None:
+    if users_db.find_one({"nickname": name}) is not None:
         return jsonify(
             {"message": "This nickname is already in use", "code": 418}
         )
-    if not re.fullmatch(
+    if not fullmatch(
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", email
     ):
         return jsonify(
-            {"message": "This is not a proper email addess", "code": 418}
+            {"message": "This is not a proper email address", "code": 418}
         )
-    if users_db.find_one({"email": email}) != None:
+    if users_db.find_one({"email": email}) is not None:
         return jsonify({"message": "This email is already in use", "code": 418})
+
+    # Hash the password before storing it
+    hashed_password = pbkdf2_sha256.hash(password)
 
     users_db.insert_one(
         {
             "email": email,
             "nickname": name,
-            "password": password,
-            "admin": False,
+            "password": hashed_password,
+            "points": 0,
+            "items": [],
+            "history": [],
+            "address": [],
+            "ratings": [],
         }
     )
+
     x = users_db.find_one({"nickname": name})
     user = User(x["_id"])
     fl.login_user(user)
-    logged_users.add(user)
     return "Success", 200
 
 
