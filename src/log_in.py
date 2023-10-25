@@ -31,7 +31,6 @@ def login():
     name = request.form["nickname"]
     password = request.form["password"]
     x = users_db.find_one({"nickname": name})
-    print("X:", x)
     if password == x["password"]:
         user = User(x["_id"])
         fl.login_user(user)
