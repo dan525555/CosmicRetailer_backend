@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from app import app, users_db
 from flask import request, jsonify
 import flask_login as fl
@@ -41,8 +42,9 @@ def login():
         # Generate a JWT token
         token = encode(
             {"user_id": str(x["_id"])},
-            app.config["SECRET_KEY"],
+            app.secret_key,
             algorithm="HS256",
+            datetime=datetime.utcnow() + timedelta(days=1),
         )
 
         logged_users.add(user)
@@ -72,6 +74,13 @@ def register():
 
     # Hash the password before storing it
     hashed_password = pbkdf2_sha256.hash(password)
+
+    token = encode(
+        {"user_id": str(x["_id"])},
+        app.secret_key,
+        algorithm="HS256",
+        datetime=datetime.utcnow() + timedelta(days=1),
+    )
 
     users_db.insert_one(
         {
