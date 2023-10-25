@@ -48,7 +48,7 @@ def login():
         )
 
         logged_users.add(user)
-        return jsonify({"access_token": token, "message": "Success"}), 200
+        return jsonify({"access_token": token, "message": "Success", "code": 200})
 
     return jsonify({"message": "Incorrect password or login", "code": 418})
 
@@ -98,7 +98,7 @@ def register():
     x = users_db.find_one({"nickname": name})
     user = User(x["_id"])
     fl.login_user(user)
-    return jsonify({"access_token": token, "message": "Success"}), 200
+    return jsonify({"access_token": token, "message": "Success", "code": 200})
 
 
 @app.route("/logout", methods=["POST"])
