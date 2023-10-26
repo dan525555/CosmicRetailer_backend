@@ -1,7 +1,21 @@
-from app import app, users_db
+from app import app, users_db, items_db
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask_jwt import jwt_required, current_identity  # Import JWT
+
+# Define an endpoint for retrieving a specific item by item_id
+@app.route("/get_item/<item_id>", methods=["GET"])
+@jwt_required()  # Requires a valid JWT token
+def get_item(item_id):
+    item_id = ObjectId(item_id)  # Convert the item_id to ObjectId
+
+    for user in users_db.find():
+        user_items = user.get('items', [])
+        for item in user_items:
+            if item.get('_id') == item_id:
+                return jsonify({"item": item, "message": "Success", "code": 200})
+
+    return jsonify({"message": "Item not found", "code": 404})
 
 # Define an endpoint for adding a new item
 @app.route("/add_item", methods=["POST"])
