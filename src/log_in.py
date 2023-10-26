@@ -90,6 +90,8 @@ def register():
             "history": [],
             "address": [],
             "ratings": [],
+            "favorites": [],
+            "bucket": [],
         }
     )
 
