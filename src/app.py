@@ -16,9 +16,6 @@ app.config.update(config_data)
 
 mongo_client = pymongo.MongoClient(app.config["MONGO_API"])
 users_db = mongo_client["data"]["users"]
-items_db = mongo_client["data"]["items"]
-addresses_db = mongo_client["data"]["addresses"]
-ratings_db = mongo_client["data"]["ratings"]
 
 # rationale for that kind of imports:
 # https://stackoverflow.com/questions/11994325/how-to-divide-flask-app-into-multiple-py-files
@@ -29,3 +26,4 @@ import favorite as favorite
 import bucket as bucket
 import user_profile as user_profile
 import search as search
+import rating as rating
