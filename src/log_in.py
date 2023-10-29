@@ -18,6 +18,7 @@ class User(fl.UserMixin):
         super().__init__()
         self.id = name
 
+
 @login_manager.user_loader
 def load_user(id):
     id = ObjectId(str(id))
@@ -46,7 +47,9 @@ def login():
         )
 
         logged_users.add(user)
-        return jsonify({"access_token": token, "message": "Success", "code": 200})
+        return jsonify(
+            {"access_token": token, "message": "Success", "code": 200}
+        )
 
     return jsonify({"message": "Incorrect password or login", "code": 418})
 
