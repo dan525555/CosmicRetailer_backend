@@ -88,7 +88,7 @@ def register():
             "email": email,
             "nickname": name,
             "password": hashed_password,
-            "points": 0,
+            "rating_avg": 0,
             "items": [],
             "history": [],
             "address": [],
