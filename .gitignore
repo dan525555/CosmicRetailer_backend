@@ -1,6 +1,5 @@
 .env
 
-src/config.json
 src/venv
 src/.venv
 src/__pycache__
