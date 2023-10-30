@@ -24,10 +24,7 @@ def get_item(item_id):
 @app.route("/add_item", methods=["POST"])
 @jwt_required()  # Requires a valid JWT token
 def add_item():
-    user_id = current_user.get(
-        "user_id"
-    )  # Get the user ID from the JWT payload
-    user = users_db.find_one({"_id": ObjectId(user_id)})
+    user = current_user 
 
     if user:
         item_data = request.json  # Assuming the item data is sent as JSON
@@ -36,7 +33,7 @@ def add_item():
 
         # Update the user's items in the database
         users_db.update_one(
-            {"_id": ObjectId(user_id)}, {"$set": {"items": user_items}}
+            {"_id": user["_id"]}, {"$set": {"items": user_items}}
         )
         return jsonify({"message": "Item added successfully", "code": 200})
     else:
@@ -47,10 +44,7 @@ def add_item():
 @app.route("/delete_item/<item_id>", methods=["DELETE"])
 @jwt_required()  # Requires a valid JWT token
 def delete_item(item_id):
-    user_id = current_user.get(
-        "user_id"
-    )  # Get the user ID from the JWT payload
-    user = users_db.find_one({"_id": ObjectId(user_id)})
+    user = current_user 
 
     if user:
         user_items = user.get("items", [])
@@ -63,7 +57,7 @@ def delete_item(item_id):
 
             # Update the user's items in the database
             users_db.update_one(
-                {"_id": ObjectId(user_id)}, {"$set": {"items": user_items}}
+                {"_id": user["_id"]}, {"$set": {"items": user_items}}
             )
             return jsonify(
                 {"message": "Item deleted successfully", "code": 200}
@@ -78,10 +72,7 @@ def delete_item(item_id):
 @app.route("/update_item/<item_id>", methods=["PUT"])
 @jwt_required()  # Requires a valid JWT token
 def update_item(item_id):
-    user_id = current_user.get(
-        "user_id"
-    )  # Get the user ID from the JWT payload
-    user = users_db.find_one({"_id": ObjectId(user_id)})
+    user = current_user 
 
     if user:
         user_items = user.get("items", [])
@@ -102,7 +93,7 @@ def update_item(item_id):
 
             # Update the user's items in the database
             users_db.update_one(
-                {"_id": ObjectId(user_id)}, {"$set": {"items": user_items}}
+                {"_id": user["_id"]}, {"$set": {"items": user_items}}
             )
             return jsonify(
                 {"message": "Item updated successfully", "code": 200}

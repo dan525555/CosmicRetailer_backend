@@ -2,9 +2,17 @@ from flask import Flask
 from flask_cors import CORS
 import json
 import pymongo
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
+app.config['JWT_TOKEN_LOCATION'] = ['headers']
+app.config['JWT_HEADER_NAME'] = 'Authorization' 
+app.config['JWT_HEADER_TYPE'] = 'Bearer'
+app.config['JWT_REQUIRED_CLAIMS'] = ['sub', 'exp']
+
+jwt = JWTManager(app)
+
 CORS(app, supports_credentials=True)
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (("http://localhost:5173", "http://localhost:5000"),)

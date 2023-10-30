@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from app import app, users_db
+from app import app, users_db, jwt
 from flask import request, jsonify
 import flask_login as fl
 from bson.objectid import ObjectId
@@ -42,6 +42,7 @@ def login():
         token = encode(
             {
                 "user_id": str(x["_id"]),
+                "sub": str(x["_id"]),
                 "exp": datetime.utcnow() + timedelta(days=1)
             },
             app.secret_key,
@@ -100,6 +101,7 @@ def register():
     token = encode(
         {
             "user_id": str(x["_id"]),
+            "sub": str(x["_id"]),
             "exp": datetime.utcnow() + timedelta(days=1)
         },
         app.secret_key,
@@ -114,3 +116,10 @@ def logout():
     logged_users.remove(fl.current_user)
     fl.logout_user()
     return "Success", 200
+
+# Define the user lookup callback
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    user_id = jwt_data["sub"]  # Assuming "sub" contains the user ID
+    user = users_db.find_one({"_id": ObjectId(user_id)})
+    return user
