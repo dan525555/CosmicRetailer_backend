@@ -40,10 +40,12 @@ def login():
 
         # Generate a JWT token
         token = encode(
-            {"user_id": str(x["_id"])},
+            {
+                "user_id": str(x["_id"]),
+                "exp": datetime.utcnow() + timedelta(days=1)
+            },
             app.secret_key,
-            algorithm="HS256",
-            datetime=datetime.utcnow() + timedelta(days=1),
+            algorithm="HS256"
         )
 
         logged_users.add(user)
@@ -76,13 +78,6 @@ def register():
     # Hash the password before storing it
     hashed_password = pbkdf2_sha256.hash(password)
 
-    token = encode(
-        {"user_id": str(x["_id"])},
-        app.secret_key,
-        algorithm="HS256",
-        datetime=datetime.utcnow() + timedelta(days=1),
-    )
-
     users_db.insert_one(
         {
             "email": email,
@@ -101,6 +96,15 @@ def register():
     x = users_db.find_one({"nickname": name})
     user = User(x["_id"])
     fl.login_user(user)
+
+    token = encode(
+        {
+            "user_id": str(x["_id"]),
+            "exp": datetime.utcnow() + timedelta(days=1)
+        },
+        app.secret_key,
+        algorithm="HS256"
+    )
     return jsonify({"access_token": token, "message": "Success", "code": 200})
 
 
