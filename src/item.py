@@ -9,13 +9,9 @@ from flask_jwt_extended import jwt_required, current_user  # Import JWT
 def get_item(item_id):
     item_id = ObjectId(item_id)  # Convert the item_id to ObjectId
 
-    for user in users_db.find():
-        user_items = user.get("items", [])
-        for item in user_items:
-            if item.get("_id") == item_id:
-                return jsonify(
-                    {"item": item, "message": "Success", "code": 200}
-                )
+    items = items_db.find_one({"_id": item_id})
+    if items:
+        return jsonify({"item": items, "message": "Success", "code": 200})
 
     return jsonify({"message": "Item not found", "code": 404})
 
@@ -27,9 +23,14 @@ def add_item():
     user = current_user 
 
     if user:
-        item_data = request.json  # Assuming the item data is sent as JSON
+        item_data = request.json
+        item_id = ObjectId()
+        item_data['_id'] = item_id
+
         user_items = user.get("items", [])
         user_items.append(item_data)
+
+        items_db.insert_one(item_data)
 
         # Update the user's items in the database
         users_db.update_one(
@@ -59,6 +60,10 @@ def delete_item(item_id):
             users_db.update_one(
                 {"_id": user["_id"]}, {"$set": {"items": user_items}}
             )
+
+            # Delete the item from the items database
+            items_db.delete_one({"_id": item_id})
+
             return jsonify(
                 {"message": "Item deleted successfully", "code": 200}
             )
@@ -94,6 +99,11 @@ def update_item(item_id):
             # Update the user's items in the database
             users_db.update_one(
                 {"_id": user["_id"]}, {"$set": {"items": user_items}}
+            )
+
+            # Update the item in the items database
+            items_db.update_one(
+                {"_id": item_id}, {"$set": new_item_data}
             )
             return jsonify(
                 {"message": "Item updated successfully", "code": 200}

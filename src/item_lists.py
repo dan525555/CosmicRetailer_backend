@@ -1,4 +1,4 @@
-from app import app, users_db
+from app import app, users_db, items_db
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required
 from bson import ObjectId
@@ -36,13 +36,10 @@ def get_all_items():
     page = int(request.args.get("page", 1))
     per_page = int(request.args.get("per_page", 10))
 
-    all_items = []
+    skip = (page - 1) * per_page
 
-    for user in users_db.find():
-        user_items = user.get("items", [])
-        all_items.extend(user_items)
-
-    paginated_items = get_paginated_items(all_items, page, per_page)
+    paginated_items_cursor = items_db.find().skip(skip).limit(per_page)
+    paginated_items = list(paginated_items_cursor)
 
     return jsonify(
         {"items": paginated_items, "message": "Success", "code": 200}
