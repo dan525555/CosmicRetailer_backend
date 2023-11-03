@@ -3,8 +3,6 @@ from app import app, users_db, ratings_db
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 
-# Your existing code
-
 # Define an endpoint for adding a rating and comment
 @app.route("/add_rating", methods=["POST"])
 @jwt_required()
