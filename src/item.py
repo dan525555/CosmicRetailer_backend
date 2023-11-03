@@ -1,7 +1,9 @@
 from app import app, users_db, items_db
+from utils import convert_to_json_serializable
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user  # Import JWT
+import json
 
 # Define an endpoint for retrieving a specific item by item_id
 @app.route("/get_item/<item_id>", methods=["GET"])
@@ -11,7 +13,10 @@ def get_item(item_id):
 
     items = items_db.find_one({"_id": item_id})
     if items:
-        return jsonify({"item": items, "message": "Success", "code": 200})
+        items_serializable = json.loads(
+            json.dumps(items, default=convert_to_json_serializable)
+        )
+        return jsonify({"item": items_serializable, "message": "Success", "code": 200})
 
     return jsonify({"message": "Item not found", "code": 404})
 
@@ -24,19 +29,33 @@ def add_item():
 
     if user:
         item_data = request.json
-        item_id = ObjectId()
-        item_data["_id"] = item_id
 
-        user_items = user.get("items", [])
-        user_items.append(item_data)
+        required_fields = ["name", "description", "price", "quantity", "photo", "category"]
+        if all(field in item_data for field in required_fields):
+            item_data["price"] = float(item_data["price"])
+            item_data["quantity"] = int(item_data["quantity"])
 
-        items_db.insert_one(item_data)
+            item_id = ObjectId()
+            item_data["_id"] = item_id
 
-        # Update the user's items in the database
-        users_db.update_one(
-            {"_id": user["_id"]}, {"$set": {"items": user_items}}
-        )
-        return jsonify({"message": "Item added successfully", "code": 200})
+            user_items = user.get("items", [])
+            user_items.append(item_data)
+
+            items_db.insert_one(item_data)
+
+            # Update the user's items in the database
+            users_db.update_one(
+                {"_id": user["_id"]}, {"$set": {"items": user_items}}
+            )
+            return jsonify({"message": "Item added successfully", "code": 200})
+        else:
+            return jsonify(
+                {
+                    "message": "Missing required fields",
+                    "code": 400,
+                    "required_fields": required_fields,
+                }
+            )
     else:
         return jsonify({"message": "User not found", "code": 404})
 

@@ -1,14 +1,10 @@
 import json
 from app import app, users_db, items_db
+from utils import convert_to_json_serializable
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required
 from bson import ObjectId
 
-
-def convert_to_json_serializable(item):
-    if isinstance(item, ObjectId):
-        return str(item)  # Konwertuj ObjectId na łańcuch znaków
-    raise TypeError(f"{type(item)} is not JSON serializable")
 
 def get_paginated_items(item_list, page, per_page):
     start = (page - 1) * per_page
