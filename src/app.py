@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 import pymongo
 from flask_jwt_extended import JWTManager
+from gridfs import GridFS
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -23,6 +24,8 @@ with open("config.json") as config_file:
 app.config.update(config_data)
 
 mongo_client = pymongo.MongoClient(app.config["MONGO_API"])
+fs = GridFS(mongo_client["data"])
+
 users_db = mongo_client["data"]["users"]
 items_db = mongo_client["data"]["items"]
 ratings_db = mongo_client["data"]["ratings"]

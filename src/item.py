@@ -1,4 +1,4 @@
-from app import app, users_db, items_db
+from app import app, fs, users_db, items_db
 from utils import convert_to_json_serializable
 from flask import request, jsonify
 from bson.objectid import ObjectId
@@ -43,6 +43,13 @@ def add_item():
 
         item_data["price"] = float(item_data["price"])
         item_data["quantity"] = int(item_data["quantity"])
+
+        if "photo" in request.files:
+            photo = request.files["photo"]
+            photo_id = fs.put(photo.read(), filename=photo.filename)
+            item_data["photo_id"] = str(photo_id)
+        else:
+            item_data["photo_id"] = None
 
         item_id = ObjectId()
         item_data["_id"] = item_id
