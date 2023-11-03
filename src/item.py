@@ -20,12 +20,12 @@ def get_item(item_id):
 @app.route("/add_item", methods=["POST"])
 @jwt_required()  # Requires a valid JWT token
 def add_item():
-    user = current_user 
+    user = current_user
 
     if user:
         item_data = request.json
         item_id = ObjectId()
-        item_data['_id'] = item_id
+        item_data["_id"] = item_id
 
         user_items = user.get("items", [])
         user_items.append(item_data)
@@ -45,7 +45,7 @@ def add_item():
 @app.route("/delete_item/<item_id>", methods=["DELETE"])
 @jwt_required()  # Requires a valid JWT token
 def delete_item(item_id):
-    user = current_user 
+    user = current_user
 
     if user:
         user_items = user.get("items", [])
@@ -77,7 +77,7 @@ def delete_item(item_id):
 @app.route("/update_item/<item_id>", methods=["PUT"])
 @jwt_required()  # Requires a valid JWT token
 def update_item(item_id):
-    user = current_user 
+    user = current_user
 
     if user:
         user_items = user.get("items", [])
@@ -102,9 +102,7 @@ def update_item(item_id):
             )
 
             # Update the item in the items database
-            items_db.update_one(
-                {"_id": item_id}, {"$set": new_item_data}
-            )
+            items_db.update_one({"_id": item_id}, {"$set": new_item_data})
             return jsonify(
                 {"message": "Item updated successfully", "code": 200}
             )

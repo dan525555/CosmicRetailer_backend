@@ -6,10 +6,10 @@ from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
-app.config['JWT_TOKEN_LOCATION'] = ['headers']
-app.config['JWT_HEADER_NAME'] = 'Authorization' 
-app.config['JWT_HEADER_TYPE'] = 'Bearer'
-app.config['JWT_REQUIRED_CLAIMS'] = ['sub', 'exp']
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+app.config["JWT_HEADER_NAME"] = "Authorization"
+app.config["JWT_HEADER_TYPE"] = "Bearer"
+app.config["JWT_REQUIRED_CLAIMS"] = ["sub", "exp"]
 
 jwt = JWTManager(app)
 
@@ -30,6 +30,7 @@ ratings_db = mongo_client["data"]["ratings"]
 # rationale for that kind of imports:
 # https://stackoverflow.com/questions/11994325/how-to-divide-flask-app-into-multiple-py-files
 import log_in as log_in
+import account as account
 import item as item
 import item_lists as item_lists
 import favorite as favorite

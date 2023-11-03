@@ -1,55 +1,31 @@
 from datetime import datetime, timedelta
 from app import app, users_db, jwt
 from flask import request, jsonify
-import flask_login as fl
 from bson.objectid import ObjectId
 from re import fullmatch
 from jwt import encode
 from passlib.hash import pbkdf2_sha256
-
-# login part
-login_manager = fl.LoginManager()
-login_manager.init_app(app)
-logged_users = set()
-
-# user class
-class User(fl.UserMixin):
-    def __init__(self, name) -> None:
-        super().__init__()
-        self.id = name
-
-
-@login_manager.user_loader
-def load_user(id):
-    id = ObjectId(str(id))
-    for user in logged_users:
-        if user.id == id:
-            return user
-    return None
+from flask_jwt_extended import jwt_required
 
 
 @app.route("/login", methods=["POST"])
 def login():
-    name = request.form["nickname"]
-    password = request.form["password"]
+    name = request.json.get("nickname")
+    password = request.json.get("password")
     x = users_db.find_one({"nickname": name})
 
     if x and pbkdf2_sha256.verify(password, x["password"]):
-        user = User(x["_id"])
-        fl.login_user(user)
-
         # Generate a JWT token
         token = encode(
             {
                 "user_id": str(x["_id"]),
                 "sub": str(x["_id"]),
-                "exp": datetime.utcnow() + timedelta(days=1)
+                "exp": datetime.utcnow() + timedelta(days=1),
             },
             app.secret_key,
-            algorithm="HS256"
+            algorithm="HS256",
         )
 
-        logged_users.add(user)
         return jsonify(
             {"access_token": token, "message": "Success", "code": 200}
         )
@@ -59,9 +35,9 @@ def login():
 
 @app.route("/register", methods=["POST"])
 def register():
-    email = request.form["email"]
-    name = request.form["nickname"]
-    password = request.form["password"]
+    email = request.json.get("email")
+    name = request.json.get("nickname")
+    password = request.json.get("password")
 
     if users_db.find_one({"nickname": name}) is not None:
         return jsonify(
@@ -95,27 +71,25 @@ def register():
     )
 
     x = users_db.find_one({"nickname": name})
-    user = User(x["_id"])
-    fl.login_user(user)
 
     token = encode(
         {
             "user_id": str(x["_id"]),
             "sub": str(x["_id"]),
-            "exp": datetime.utcnow() + timedelta(days=1)
+            "exp": datetime.utcnow() + timedelta(days=1),
         },
         app.secret_key,
-        algorithm="HS256"
+        algorithm="HS256",
     )
     return jsonify({"access_token": token, "message": "Success", "code": 200})
 
 
 @app.route("/logout", methods=["POST"])
-@fl.login_required
+@jwt_required()
 def logout():
-    logged_users.remove(fl.current_user)
-    fl.logout_user()
-    return "Success", 200
+    # TODO jwt logout - delete token on client side
+    jsonify({"message": "Success", "code": 200})
+
 
 # Define the user lookup callback
 @jwt.user_lookup_loader

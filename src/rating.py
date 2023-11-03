@@ -24,7 +24,7 @@ def add_rating():
         seller_ratings.append(
             {
                 "_id": rating_id,
-                "user": current_user.nickname,
+                "user": current_user["nickname"],
                 "rating": rating,
                 "comment": comment,
             }
