@@ -31,24 +31,8 @@ def add_item():
         item_data = request.json
 
         required_fields = ["name", "description", "price", "quantity", "photo", "category"]
-        if all(field in item_data for field in required_fields):
-            item_data["price"] = float(item_data["price"])
-            item_data["quantity"] = int(item_data["quantity"])
 
-            item_id = ObjectId()
-            item_data["_id"] = item_id
-
-            user_items = user.get("items", [])
-            user_items.append(item_data)
-
-            items_db.insert_one(item_data)
-
-            # Update the user's items in the database
-            users_db.update_one(
-                {"_id": user["_id"]}, {"$set": {"items": user_items}}
-            )
-            return jsonify({"message": "Item added successfully", "code": 200})
-        else:
+        if not all(field in item_data for field in required_fields):
             return jsonify(
                 {
                     "message": "Missing required fields",
@@ -56,6 +40,23 @@ def add_item():
                     "required_fields": required_fields,
                 }
             )
+
+        item_data["price"] = float(item_data["price"])
+        item_data["quantity"] = int(item_data["quantity"])
+
+        item_id = ObjectId()
+        item_data["_id"] = item_id
+
+        user_items = user.get("items", [])
+        user_items.append(item_data)
+
+        items_db.insert_one(item_data)
+
+        # Update the user's items in the database
+        users_db.update_one(
+            {"_id": user["_id"]}, {"$set": {"items": user_items}}
+        )
+        return jsonify({"message": "Item added successfully", "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
 
