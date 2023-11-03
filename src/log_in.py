@@ -35,53 +35,64 @@ def login():
 
 @app.route("/register", methods=["POST"])
 def register():
-    email = request.json.get("email")
-    name = request.json.get("nickname")
-    password = request.json.get("password")
+    required_fields = ["email", "nickname", "password"]
 
-    if users_db.find_one({"nickname": name}) is not None:
-        return jsonify(
-            {"message": "This nickname is already in use", "code": 418}
+    if all(field in request.json for field in required_fields):
+        email = request.json.get("email")
+        name = request.json.get("nickname")
+        password = request.json.get("password")
+
+        if users_db.find_one({"nickname": name}) is not None:
+            return jsonify(
+                {"message": "This nickname is already in use", "code": 418}
+            )
+        if not fullmatch(
+            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", email
+        ):
+            return jsonify(
+                {"message": "This is not a proper email address", "code": 418}
+            )
+        if users_db.find_one({"email": email}) is not None:
+            return jsonify({"message": "This email is already in use", "code": 418})
+
+        # Hash the password before storing it
+        hashed_password = pbkdf2_sha256.hash(password)
+
+        users_db.insert_one(
+            {
+                "email": email,
+                "nickname": name,
+                "password": hashed_password,
+                "rating_avg": 0,
+                "items": [],
+                "history": [],
+                "address": [],
+                "ratings": [],
+                "favorites": [],
+                "bucket": [],
+            }
         )
-    if not fullmatch(
-        r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", email
-    ):
-        return jsonify(
-            {"message": "This is not a proper email address", "code": 418}
+
+        x = users_db.find_one({"nickname": name})
+
+        token = encode(
+            {
+                "user_id": str(x["_id"]),
+                "sub": str(x["_id"]),
+                "exp": datetime.utcnow() + timedelta(days=1),
+            },
+            app.secret_key,
+            algorithm="HS256",
         )
-    if users_db.find_one({"email": email}) is not None:
-        return jsonify({"message": "This email is already in use", "code": 418})
-
-    # Hash the password before storing it
-    hashed_password = pbkdf2_sha256.hash(password)
-
-    users_db.insert_one(
-        {
-            "email": email,
-            "nickname": name,
-            "password": hashed_password,
-            "rating_avg": 0,
-            "items": [],
-            "history": [],
-            "address": [],
-            "ratings": [],
-            "favorites": [],
-            "bucket": [],
-        }
-    )
-
-    x = users_db.find_one({"nickname": name})
-
-    token = encode(
-        {
-            "user_id": str(x["_id"]),
-            "sub": str(x["_id"]),
-            "exp": datetime.utcnow() + timedelta(days=1),
-        },
-        app.secret_key,
-        algorithm="HS256",
-    )
-    return jsonify({"access_token": token, "message": "Success", "code": 200})
+        return jsonify({"access_token": token, "message": "Success", "code": 200})
+    else:
+        return jsonify(
+            {
+                "message": "Missing required fields",
+                "code": 400,
+                "required_fields": required_fields,
+            }
+        )
 
 
 @app.route("/logout", methods=["POST"])
