@@ -29,3 +29,21 @@ def toggle_favorite(item_id):
         return jsonify({"message": "Item not found", "code": 404})
     else:
         return jsonify({"message": "User not found", "code": 404})
+    
+# Define an endpoint for checking if an item is favorite
+@app.route("/is_favorite/<item_id>", methods=["GET"])
+@jwt_required()  # Requires a valid JWT token
+def is_favorite(item_id):
+    user = current_user
+
+    if user:
+        user_items = user.get("items", [])
+        item_id = ObjectId(item_id)
+
+        for item in user_items:
+            if item["_id"] == item_id:
+                return jsonify({"isFavorite": item["isFavorite"]})
+
+        return jsonify({"message": "Item not found", "code": 404})
+    else:
+        return jsonify({"message": "User not found", "code": 404})
