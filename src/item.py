@@ -30,7 +30,7 @@ def add_item():
     if user:
         item_data = request.json
 
-        required_fields = ["name", "description", "price", "quantity", "photo", "category"]
+        required_fields = ["name", "description", "price", "quantity", "photo", "category", "isFavorite", "isOwner"]
 
         if not all(field in item_data for field in required_fields):
             return jsonify(
