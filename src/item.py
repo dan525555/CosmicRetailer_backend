@@ -63,7 +63,7 @@ def add_item():
         users_db.update_one(
             {"_id": user["_id"]}, {"$set": {"items": user_items}}
         )
-        return jsonify({"message": "Item added successfully", "code": 200})
+        return jsonify({"id": str(item_id), "message": "Item added successfully", "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
 
