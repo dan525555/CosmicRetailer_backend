@@ -1,5 +1,5 @@
 import os
-from app import app, fs, users_db, items_db
+from app import app, fs, users_db, items_db, UPLOAD_FOLDER
 from utils import convert_to_json_serializable, allowed_file
 from flask import request, jsonify
 from bson.objectid import ObjectId
@@ -66,8 +66,9 @@ def add_item():
             photo = request.files["photo"]
             if photo and allowed_file(photo.filename):
                 photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
-                item_data["photoUrl"] = f"https://cosmicretailer.onrender.com/static/ing/{photo.filename}"
-            item_data["photoUrl"] = None
+                item_data["photoUrl"] = f"https://cosmicretailer.onrender.com/{UPLOAD_FOLDER}/{photo.filename}"
+            else:
+                item_data["photoUrl"] = None
         else:
             item_data["photoUrl"] = None
 
