@@ -38,6 +38,5 @@ import item as item
 import item_lists as item_lists
 import favorite as favorite
 import bucket as bucket
-import user_profile as user_profile
 import search as search
 import rating as rating
