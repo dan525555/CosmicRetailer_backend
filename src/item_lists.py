@@ -64,8 +64,11 @@ def get_all_items():
     # )
 
     items = items_db.find()
-    items_serializable = json.loads(json.dumps(items, default=convert_to_json_serializable))
+    # items_serializable = json.loads(json.dumps(items, default=convert_to_json_serializable))
 
-    return jsonify(
-        {"items": items_serializable, "message": "Success", "code": 200}
-    )
+    if items:
+        return jsonify(
+            {"items": items, "message": "Success", "code": 200}
+        )
+
+    return jsonify({"message": "Items not found", "code": 404})
