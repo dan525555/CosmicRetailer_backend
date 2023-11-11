@@ -53,3 +53,37 @@ def is_owner(item_id):
         return jsonify({"isOwner": False})
     else:
         return jsonify({"message": "User not found", "code": 404})
+    
+# Define an endpoint for updating user data
+@app.route("/update_user", methods=["POST"])
+@jwt_required()
+def update_user():
+    user = current_user
+
+    if user:
+        user_data = request.json
+
+        required_fields = ["nickname", "email", "phone", "address", "country"]
+
+        if not all(field in user_data for field in required_fields):
+            return jsonify(
+                {
+                    "message": "Missing required fields",
+                    "code": 400,
+                    "required_fields": required_fields,
+                }
+            )
+        
+        full_address = {
+            "address": user_data["address"],
+            "country": user_data["country"]
+        }
+
+        users_db.update_one(
+            {"nickname": user["nickname"]},
+            {"$set": {"email": user_data["email"], "phone": user_data["phone"], "address": full_address}},
+        )
+        
+        return jsonify({"message": "Success", "code": 200})
+    else:
+        return jsonify({"message": "User not found", "code": 404})

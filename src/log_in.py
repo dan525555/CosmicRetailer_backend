@@ -85,7 +85,7 @@ def register():
             "rating_avg": 0,
             "items": [],
             "history": [],
-            "address": [],
+            "address": "",
             "ratings": [],
             "favorites": [],
             "bucket": [],
