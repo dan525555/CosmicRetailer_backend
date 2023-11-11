@@ -46,7 +46,7 @@ def add_item():
     if user:
         item_data = request.form.to_dict()
 
-        required_fields = ["name", "description", "price", "quantity", "photo", "category"]
+        required_fields = ["name", "description", "price", "quantity", "category"]
 
         if not all(field in item_data for field in required_fields):
             return jsonify(
