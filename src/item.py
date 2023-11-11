@@ -5,6 +5,7 @@ from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user  # Import JWT
 import json
+import requests
 
 # Define an endpoint for retrieving a specific item by item_id
 @app.route("/get_item/<item_id>", methods=["GET"])
@@ -15,7 +16,7 @@ def get_item(item_id):
     items = items_db.find_one({"_id": item_id})
     if items:
         items_serializable = json.loads(
-            json.dumps(items, default=convert_to_json_serializable)
+            json.dumps(items, default=convert_to_json_serializable)   
         )
 
         # find user by id
@@ -31,7 +32,24 @@ def get_item(item_id):
                 "email": user_serializable["email"],
                 "address": user_serializable["address"],
             }
-            return jsonify({"item": items_serializable, "user": user_data, "message": "Success", "code": 200})
+
+            # Check if the current user is the owner of the item
+            is_owner_response = requests.get(f"https://cosmicretailer.onrender.com/is_owner/{item_id}")
+            is_owner_data = is_owner_response.json()
+
+            # Check if the item is a favorite of the current user
+            is_favorite_response = requests.get(f"https://cosmicretailer.onrender.com/is_favorite/{item_id}")
+            is_favorite_data = is_favorite_response.json()
+
+
+            return jsonify({
+                "item": items_serializable,
+                "user": user_data,
+                "isOwner": is_owner_data["isOwner"],
+                "isFavorite": is_favorite_data["isFavorite"],
+                "message": "Success",
+                "code": 200
+            })
 
         return jsonify({"message": "User not found", "code": 404})
         
