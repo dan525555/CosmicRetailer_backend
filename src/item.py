@@ -16,8 +16,24 @@ def get_item(item_id):
         items_serializable = json.loads(
             json.dumps(items, default=convert_to_json_serializable)
         )
-        return jsonify({"item": items_serializable, "message": "Success", "code": 200})
 
+        # find user by id
+        user = users_db.find_one({"_id": ObjectId(items_serializable["userId"])})
+        if user:
+            user_serializable = json.loads(
+                json.dumps(user, default=convert_to_json_serializable)
+            )
+
+            user_data = {
+                "id": user_serializable["_id"],
+                "nickname": user_serializable["nickname"],
+                "email": user_serializable["email"],
+                "address": user_serializable["address"],
+            }
+            return jsonify({"item": items_serializable, "user": user_data, "message": "Success", "code": 200})
+
+        return jsonify({"message": "User not found", "code": 404})
+        
     return jsonify({"message": "Item not found", "code": 404})
 
 
@@ -43,6 +59,7 @@ def add_item():
 
         item_data["price"] = float(item_data["price"])
         item_data["quantity"] = int(item_data["quantity"])
+        item_data["userId"] = str(user["_id"])
 
         if "photo" in request.files:
             photo = request.files["photo"]
