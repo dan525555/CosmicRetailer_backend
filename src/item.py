@@ -28,7 +28,7 @@ def add_item():
     user = current_user
 
     if user:
-        item_data = request.json
+        item_data = request.form.to_dict()
 
         required_fields = ["name", "description", "price", "quantity", "photo", "category"]
 
@@ -118,9 +118,7 @@ def update_item(item_id):
                 break
 
         if item_index is not None:
-            new_item_data = (
-                request.json
-            )  # Assuming the updated item data is sent as JSON
+            new_item_data = request.form.to_dict()
             user_items[item_index].update(new_item_data)
 
             # Update the user's items in the database
