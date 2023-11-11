@@ -41,7 +41,6 @@ def get_item(item_id):
             is_favorite_response = requests.get(f"https://cosmicretailer.onrender.com/is_favorite/{item_id}")
             is_favorite_data = is_favorite_response.json()
 
-
             return jsonify({
                 "item": items_serializable,
                 "user": user_data,

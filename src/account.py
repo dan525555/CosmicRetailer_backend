@@ -44,7 +44,6 @@ def is_owner(item_id):
 
     if user:
         user_items = user.get("items", [])
-        item_id = ObjectId(item_id)
 
         for item in user_items:
             if item["_id"] == item_id:
