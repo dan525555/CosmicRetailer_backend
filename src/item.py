@@ -152,12 +152,12 @@ def update_item(item_id):
             return jsonify({"message": "Item not found", "code": 404})
     else:
         return jsonify({"message": "User not found", "code": 404})
-    
+
 # Define an endpoint for retrieving a specific photo by photo_id
 @app.route('/image/<photo_id>')
 @jwt_required()  # Requires a valid JWT token
-def get_image(file_id):
-    file = fs.get(file_id)
+def get_image(photo_id):
+    file = fs.get(photo_id)
     if file is not None:
         response = app.response_class(file, content_type=file.content_type)
         return response
