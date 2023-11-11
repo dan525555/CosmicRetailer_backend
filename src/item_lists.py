@@ -36,7 +36,7 @@ def get_specific_user_items(user_id):
 
     if user:
         user_items = user.get("items", [])
-        user_items_serializable = json.loads(json.dumps(user_items, default=convert_to_json_serializable))
+        user_items_serializable = json.loads(json.dumps(list(user_items), default=convert_to_json_serializable))
 
         return jsonify(
             {"items": user_items_serializable, "message": "Success", "code": 200}
@@ -64,11 +64,11 @@ def get_all_items():
     # )
 
     items = items_db.find()
-    # items_serializable = json.loads(json.dumps(items, default=convert_to_json_serializable))
+    items_serializable = json.loads(json.dumps(list(items), default=convert_to_json_serializable))
 
     if items:
         return jsonify(
-            {"items": items, "message": "Success", "code": 200}
+            {"items": items_serializable, "message": "Success", "code": 200}
         )
 
     return jsonify({"message": "Items not found", "code": 404})
