@@ -33,21 +33,21 @@ def get_item(item_id):
                 "address": user_serializable["address"],
             }
 
-            headers = {"Authorization": f"Bearer {request.headers.get('Authorization')}"}
+            headers = {"Authorization": f"{request.headers.get('Authorization')}"}
 
             # Check if the current user is the owner of the item
             is_owner_response = requests.get(f"https://cosmicretailer.onrender.com/is_owner/{item_id}", headers=headers)
-            # is_owner_data = is_owner_response.json()
+            is_owner_data = is_owner_response.json()
 
             # Check if the item is a favorite of the current user
             is_favorite_response = requests.get(f"https://cosmicretailer.onrender.com/is_favorite/{item_id}", headers=headers)
-            # is_favorite_data = is_favorite_response.json()
+            is_favorite_data = is_favorite_response.json()
 
             return jsonify({
                 "item": items_serializable,
                 "user": user_data,
-                "isOwner": str(is_owner_response),
-                "isFavorite": str(is_favorite_response),
+                "isOwner": is_owner_data['isOwner'],
+                "isFavorite": is_favorite_data['isFavorite'],
                 "message": "Success",
                 "code": 200
             })
