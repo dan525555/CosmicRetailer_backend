@@ -1,5 +1,6 @@
+import os
 from app import app, fs, users_db, items_db
-from utils import convert_to_json_serializable
+from utils import convert_to_json_serializable, allowed_file
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user  # Import JWT
@@ -63,10 +64,12 @@ def add_item():
 
         if "photo" in request.files:
             photo = request.files["photo"]
-            photo_id = fs.put(photo.read(), filename=photo.filename)
-            item_data["photo_id"] = str(photo_id)
+            if photo and allowed_file(photo.filename):
+                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
+                item_data["photoUrl"] = f"https://cosmicretailer.onrender.com/static/ing/{photo.filename}"
+            item_data["photoUrl"] = None
         else:
-            item_data["photo_id"] = None
+            item_data["photoUrl"] = None
 
         item_id = ObjectId()
         item_data["_id"] = item_id
@@ -152,13 +155,3 @@ def update_item(item_id):
             return jsonify({"message": "Item not found", "code": 404})
     else:
         return jsonify({"message": "User not found", "code": 404})
-
-# Define an endpoint for retrieving a specific photo by photo_id
-@app.route('/image/<photo_id>')
-@jwt_required()  # Requires a valid JWT token
-def get_image(photo_id):
-    file = fs.get(photo_id)
-    if file is not None:
-        response = app.response_class(file, content_type=file.content_type)
-        return response
-    return 'File not found.'

@@ -26,6 +26,10 @@ app.config.update(config_data)
 mongo_client = pymongo.MongoClient(app.config["MONGO_API"])
 fs = GridFS(mongo_client["data"])
 
+app.config['UPLOAD_FOLDER'] = 'static/ing'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 users_db = mongo_client["data"]["users"]
 items_db = mongo_client["data"]["items"]
 ratings_db = mongo_client["data"]["ratings"]
