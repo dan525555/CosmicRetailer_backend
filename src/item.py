@@ -35,10 +35,12 @@ def get_item(item_id):
 
             # Check if the current user is the owner of the item
             is_owner_response = requests.get(f"https://cosmicretailer.onrender.com/is_owner/{item_id}")
+            print(is_owner_response)
             is_owner_data = is_owner_response.json()
 
             # Check if the item is a favorite of the current user
             is_favorite_response = requests.get(f"https://cosmicretailer.onrender.com/is_favorite/{item_id}")
+            print(is_favorite_response)
             is_favorite_data = is_favorite_response.json()
 
             return jsonify({
