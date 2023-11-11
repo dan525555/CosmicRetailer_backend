@@ -11,22 +11,24 @@ def toggle_favorite(item_id):
     user = current_user
 
     if user:
-        user_items = user.get("items", [])
-        item_id = ObjectId(item_id)
+        favorite_items = user.get("favorites", [])
 
-        for item in user_items:
+        for item in favorite_items:
             if item["_id"] == item_id:
-                # toggle the isFavorite field
-                item["isFavorite"] = not item["isFavorite"]
-                
-                # update the user's items
+                favorite_items.remove(item)
                 users_db.update_one(
                     {"_id": user["_id"]},
-                    {"$set": {"items": user_items}},
+                    {"$set": {"favorites": favorite_items}},
                 )
                 return jsonify({"message": "Success", "code": 200})
+        
+        favorite_items.append({"_id": item_id})
+        users_db.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"favorites": favorite_items}},
+        )
 
-        return jsonify({"message": "Item not found", "code": 404})
+        return jsonify({"message": "Success", "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
     
