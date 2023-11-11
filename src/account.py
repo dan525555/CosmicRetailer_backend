@@ -46,7 +46,7 @@ def is_owner(item_id):
         user_items = user.get("items", [])
 
         for item in user_items:
-            if item["_id"] == item_id:
+            if str(item["_id"]) == item_id:
                 return jsonify({"isOwner": True})
 
         return jsonify({"isOwner": False})
