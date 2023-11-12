@@ -78,11 +78,6 @@ def update_user():
                     "required_fields": required_fields,
                 }
             )
-        
-        full_address = {
-            "address": user_data["address"],
-            "country": user_data["country"]
-        }
 
         if "photo" in request.files:
             user_image = request.files["photo"]
@@ -97,7 +92,8 @@ def update_user():
         update_fields = {
             "email": user_data["email"],
             "phone": user_data["phone"],
-            "address": full_address,
+            "address": user_data["address"],
+            "country": user_data["country"],
             "fullName": user_data["fullName"],
             "photoUrl": user_data["photoUrl"]
         }
