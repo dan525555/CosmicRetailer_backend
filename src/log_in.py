@@ -90,6 +90,9 @@ def register():
             "favorites": [],
             "bucket": [],
             "photoUrl": "",
+            "phone": "",
+            "fullName": "",
+            "country": "",
         }
     )
 

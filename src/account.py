@@ -114,3 +114,30 @@ def update_user():
         return jsonify({"message": "Success", "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
+    
+# Define an endpoint for retrieving user data
+@app.route("/get_user", methods=["GET"])
+@jwt_required()
+def get_user():
+    user = current_user
+
+    if user:
+        user_data = {
+            "nickname": user["nickname"],
+            "fullName": user.get("fullName", ""),
+            "email": user["email"],
+            "phone": user.get("phone", ""),
+            "address": user.get("address", {}),
+            "country": user.get("country", ""),
+            "photoUrl": user.get("photoUrl", None),
+            "rating_avg": user.get("rating_avg", 0),
+            "items": user.get("items", []),
+            "history": user.get("history", []),
+            "ratings": user.get("ratings", []),
+            "favorites": user.get("favorites", []),
+            "bucket": user.get("bucket", []),
+        }
+
+        return jsonify({"user": user_data, "code": 200})
+    else:
+        return jsonify({"message": "User not found", "code": 404})
