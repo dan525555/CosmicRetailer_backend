@@ -83,11 +83,6 @@ def update_user():
             user_image = request.files["photo"]
             image_id = fs.put(user_image.read(), filename=user_image.filename)
             user_data["photoUrl"] = f"https://cosmicretailer.onrender.com/user_image/{image_id}"
-        else:
-            if "photoUrl" in user:
-                user_data["photoUrl"] = user["photoUrl"]
-            else:
-                user_data["photoUrl"] = None
 
         update_fields = {
             "email": user_data["email"],
