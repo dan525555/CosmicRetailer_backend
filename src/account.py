@@ -3,6 +3,7 @@ from app import app, users_db, fs
 from flask import request, jsonify, send_file
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user
+from utils import serialize_object_ids
 
 @app.route('/user_image/<image_id>', methods=['GET'])
 def user_image(image_id):
@@ -122,6 +123,12 @@ def get_user():
     user = current_user
 
     if user:
+        items = user.get("items", [])
+        history = user.get("history", [])
+        ratings = user.get("ratings", [])
+        favorites = user.get("favorites", [])
+        bucket = user.get("bucket", [])
+
         user_data = {
             "nickname": user["nickname"],
             "fullName": user.get("fullName", ""),
@@ -131,11 +138,11 @@ def get_user():
             "country": user.get("country", ""),
             "photoUrl": user.get("photoUrl", None),
             "rating_avg": user.get("rating_avg", 0),
-            "items": user.get("items", []),
-            "history": user.get("history", []),
-            "ratings": user.get("ratings", []),
-            "favorites": user.get("favorites", []),
-            "bucket": user.get("bucket", []),
+            "items": serialize_object_ids(items),
+            "history": serialize_object_ids(history),
+            "ratings": serialize_object_ids(ratings),
+            "favorites": serialize_object_ids(favorites),
+            "bucket": serialize_object_ids(bucket)
         }
 
         return jsonify({"user": user_data, "code": 200})
