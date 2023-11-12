@@ -1,8 +1,13 @@
-from app import app, users_db
-from flask import request, jsonify
+from io import BytesIO
+from app import app, users_db, fs
+from flask import request, jsonify, send_file
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user
 
+@app.route('/user_image/<image_id>', methods=['GET'])
+def get_image(image_id):
+    file = fs.get(ObjectId(image_id))
+    return send_file(BytesIO(file.read()), mimetype='image/jpeg')
 
 @app.route("/change_email", methods=["POST"])
 @jwt_required()
@@ -60,7 +65,7 @@ def update_user():
     user = current_user
 
     if user:
-        user_data = request.json
+        user_data = request.form.to_dict()
 
         required_fields = ["nickname", "fullName", "email", "phone", "address", "country"]
 
@@ -78,11 +83,34 @@ def update_user():
             "country": user_data["country"]
         }
 
-        users_db.update_one(
-            {"nickname": user["nickname"]},
-            {"$set": {"email": user_data["email"], "phone": user_data["phone"], "address": full_address}, "fullName": user_data["fullName"]},
-        )
-        
+        if "photo" in request.files:
+            user_image = request.files["photo"]
+            image_id = fs.put(user_image.read(), filename=user_image.filename)
+            user_data["photoUrl"] = f"https://cosmicretailer.onrender.com/user_image/{image_id}"
+        else:
+            if "photoUrl" in user:
+                user_data["photoUrl"] = user["photoUrl"]
+            else:
+                user_data["photoUrl"] = None
+
+        update_fields = {
+            "email": user_data["email"],
+            "phone": user_data["phone"],
+            "address": full_address,
+            "fullName": user_data["fullName"],
+            "photoUrl": user_data["photoUrl"]
+        }
+
+        update_query = {
+            "$set": update_fields
+        }
+
+        filter_query = {
+            "nickname": user["nickname"]
+        }
+
+        users_db.update_one(filter_query, update_query)
+
         return jsonify({"message": "Success", "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})

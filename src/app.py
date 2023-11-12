@@ -27,12 +27,6 @@ app.config.update(config_data)
 mongo_client = pymongo.MongoClient(app.config["MONGO_API"])
 fs = GridFS(mongo_client["data"])
 
-UPLOAD_FOLDER = 'static/ing'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-    
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
