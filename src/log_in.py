@@ -89,6 +89,7 @@ def register():
             "ratings": [],
             "favorites": [],
             "bucket": [],
+            "photoUrl": "",
         }
     )
 
