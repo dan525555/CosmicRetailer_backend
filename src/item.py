@@ -1,7 +1,6 @@
 from io import BytesIO
-import os
-from app import app, fs, users_db, items_db, UPLOAD_FOLDER
-from utils import convert_to_json_serializable, allowed_file
+from app import app, fs, users_db, items_db
+from utils import convert_to_json_serializable
 from flask import request, jsonify, send_file
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user  # Import JWT
