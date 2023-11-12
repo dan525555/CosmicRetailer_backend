@@ -1,11 +1,17 @@
+from io import BytesIO
 import os
 from app import app, fs, users_db, items_db, UPLOAD_FOLDER
 from utils import convert_to_json_serializable, allowed_file
-from flask import request, jsonify
+from flask import request, jsonify, send_file
 from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user  # Import JWT
 import json
 import requests
+
+@app.route('/get_image/<image_id>', methods=['GET'])
+def get_image(image_id):
+    file = fs.get(ObjectId(image_id))
+    return send_file(BytesIO(file.read()), mimetype='image/jpeg')
 
 # Define an endpoint for retrieving a specific item by item_id
 @app.route("/get_item/<item_id>", methods=["GET"])
@@ -83,11 +89,8 @@ def add_item():
 
         if "photo" in request.files:
             photo = request.files["photo"]
-            if photo and allowed_file(photo.filename):
-                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
-                item_data["photoUrl"] = f"https://cosmicretailer.onrender.com/{UPLOAD_FOLDER}/{photo.filename}"
-            else:
-                item_data["photoUrl"] = None
+            image_id = fs.put(photo.read(), filename=photo.filename)
+            item_data["photoUrl"] = f"https://cosmicretailer.onrender.com/get_image/{image_id}"
         else:
             item_data["photoUrl"] = None
 
