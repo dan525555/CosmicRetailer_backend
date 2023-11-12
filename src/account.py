@@ -62,7 +62,7 @@ def update_user():
     if user:
         user_data = request.json
 
-        required_fields = ["nickname", "email", "phone", "address", "country"]
+        required_fields = ["nickname", "fullName", "email", "phone", "address", "country"]
 
         if not all(field in user_data for field in required_fields):
             return jsonify(
@@ -80,7 +80,7 @@ def update_user():
 
         users_db.update_one(
             {"nickname": user["nickname"]},
-            {"$set": {"email": user_data["email"], "phone": user_data["phone"], "address": full_address}},
+            {"$set": {"email": user_data["email"], "phone": user_data["phone"], "address": full_address}, "fullName": user_data["fullName"]},
         )
         
         return jsonify({"message": "Success", "code": 200})
