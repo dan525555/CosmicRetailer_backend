@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from flask_jwt_extended import jwt_required, current_user
 
 @app.route('/user_image/<image_id>', methods=['GET'])
-def get_image(image_id):
+def user_image(image_id):
     file = fs.get(ObjectId(image_id))
     return send_file(BytesIO(file.read()), mimetype='image/jpeg')
 
