@@ -146,7 +146,6 @@ def get_user():
         return jsonify({"message": "User not found", "code": 404})
 
 @app.route("/set_wallet_address", methods=["POST"])
-@jwt_required()
 def send_wallet_address():
     user = current_user
 
