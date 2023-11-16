@@ -93,6 +93,7 @@ def register():
             "phone": "",
             "fullName": "",
             "country": "",
+            "walletAddress": "",
         }
     )
 
