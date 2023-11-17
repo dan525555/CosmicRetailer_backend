@@ -147,17 +147,10 @@ def get_user():
 
 @app.route("/set_wallet_address", methods=["POST"])
 def send_wallet_address():
-    user = current_user
+    nickname = request.json.get("nickname")
+    wallet_address = request.json.get("walletAddress")
 
-    if user:
-        wallet_address = request.json.get("walletAddress")
-
-        if wallet_address:
-            users_db.update_one(
-                {"nickname": user["nickname"]}, {"$set": {"walletAddress": wallet_address}}
-            )
-            return jsonify({"message": "Success", "code": 200})
-        else:
-            return jsonify({"message": "Missing wallet address", "code": 400})
-    else:
-        return jsonify({"message": "User not found", "code": 404})
+    users_db.update_one(
+        {"nickname": nickname}, {"$set": {"walletAddress": wallet_address}}
+    )
+    return jsonify({"message": "Success", "code": 200})
