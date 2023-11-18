@@ -138,7 +138,8 @@ def get_user():
             "history": serialize_object_ids(history),
             "ratings": serialize_object_ids(ratings),
             "favorites": serialize_object_ids(favorites),
-            "bucket": serialize_object_ids(bucket)
+            "bucket": serialize_object_ids(bucket),
+            "walletAddres": user.get("walletAddress", '')
         }
 
         return jsonify({"user": user_data, "code": 200})
