@@ -155,3 +155,13 @@ def send_wallet_address():
         {"nickname": nickname}, {"$set": {"walletAddress": wallet_address}}
     )
     return jsonify({"message": "Success", "code": 200})
+
+@app.route("/update_wallet_address", methods=["POST"])
+@jwt_required()
+def update_wallet_address():
+    wallet_address = request.json.get("walletAddress")
+
+    users_db.update_one(
+        {"nickname": current_user["nickname"]}, {"$set": {"walletAddress": wallet_address}}
+    )
+    return jsonify({"message": "Success", "code": 200})
