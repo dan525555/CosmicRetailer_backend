@@ -47,3 +47,4 @@ import favorite as favorite
 import bucket as bucket
 import search as search
 import rating as rating
+import wallet as wallet
