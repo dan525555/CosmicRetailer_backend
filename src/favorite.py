@@ -67,13 +67,21 @@ def get_favorites():
 
     if user:
         favorite_items = user.get("favorites", [])
+        favorite_items_copy = favorite_items.deepcopy()
         favorites = []
 
-        for item in favorite_items:
+        for item in favorite_items_copy:
             item_id = item["_id"]
             item = items_db.find_one({"_id": item_id})
-            item["_id"] = str(item["_id"])
-            favorites.append(item)
+            if item:
+                item["_id"] = str(item["_id"])
+                favorites.append(item)
+            else: 
+                favorite_items.remove(item)
+                users_db.update_one(
+                    {"_id": user["_id"]},
+                    {"$set": {"favorites": favorite_items}},
+                )
 
         return jsonify({"favorites": serialize_object_ids(favorites), "message": "Success", "code": 200})
     else:

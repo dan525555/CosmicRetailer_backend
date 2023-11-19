@@ -45,3 +45,4 @@ urllib3==1.26.18
 Werkzeug==2.2.2
 wrapt==1.15.0
 zipp==3.8.1
+web3==6.11.3

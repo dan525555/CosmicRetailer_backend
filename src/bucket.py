@@ -67,13 +67,21 @@ def get_bucket():
 
     if user:
         bucket_items = user.get("buckets", [])
+        bucket_items_copy = bucket_items.deepcopy()
         bucket = []
 
         for item in bucket_items:
             item_id = item["_id"]
             item = items_db.find_one({"_id": item_id})
-            item["_id"] = str(item["_id"])
-            bucket.append(item)
+            if item:
+                item["_id"] = str(item["_id"])
+                bucket.append(item)
+            else:
+                bucket_items.remove(item)
+                users_db.update_one(
+                    {"_id": user["_id"]},
+                    {"$set": {"buckets": bucket_items}},
+                )
 
         return jsonify({"bucketItems": serialize_object_ids(bucket), "message": "Success", "code": 200})
     else:

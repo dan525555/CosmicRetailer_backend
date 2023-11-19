@@ -5,6 +5,7 @@ import json
 import pymongo
 from flask_jwt_extended import JWTManager
 from gridfs import GridFS
+from web3 import Web3
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -23,6 +24,8 @@ with open("config.json") as config_file:
     config_data = json.load(config_file)
 
 app.config.update(config_data)
+
+web3 = Web3(Web3.HTTPProvider(app.config["INFURA_API_URL"]))  
 
 mongo_client = pymongo.MongoClient(app.config["MONGO_API"])
 fs = GridFS(mongo_client["data"])
