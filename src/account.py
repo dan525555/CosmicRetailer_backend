@@ -145,6 +145,21 @@ def get_user():
         return jsonify({"user": user_data, "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
+    
+# Define an endpoint for retrieving user data
+@app.route("/get_user_wallet/<user_id>", methods=["GET"])
+@jwt_required()
+def get_user_by_id(user_id):
+    user = users_db.find_one({"_id": ObjectId(user_id)})
+
+    if user:
+        wallet = user.get("walletAddress", '')
+        if wallet == '':
+            return jsonify({"message": "User has no wallet", "code": 404})
+
+        return jsonify({"wallet": wallet, "code": 200})
+    else:
+        return jsonify({"message": "User not found", "code": 404})
 
 @app.route("/set_wallet_address", methods=["POST"])
 def send_wallet_address():
