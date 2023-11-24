@@ -191,7 +191,7 @@ def get_user_by_id(user_id):
         if wallet == '':
             return jsonify({"message": "User has no wallet", "code": 404})
 
-        return jsonify({"wallet": wallet, "code": 200})
+        return jsonify({"walletAddress": wallet, "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
 
