@@ -24,7 +24,7 @@ def buyItem(item_id):
         return jsonify({'message': 'item not found', "code": 404})
 
     response = requests.get("https://cosmicretailer.onrender.com/get_user_wallet/" + item['userId'])
-    if response.json()['code'] != 200:
+    if response.json['code'] != 200:
         return jsonify({'message': response.json()['message'], "code": 404})
 
     from_account = current_user['walletAddress']
