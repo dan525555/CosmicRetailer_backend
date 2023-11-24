@@ -36,6 +36,7 @@ def get_item(item_id):
                 "nickname": user_serializable["nickname"],
                 "email": user_serializable["email"],
                 "address": user_serializable["address"],
+                "rating_avg": user_serializable["rating_avg"],
             }
 
             headers = {"Authorization": f"{request.headers.get('Authorization')}"}
