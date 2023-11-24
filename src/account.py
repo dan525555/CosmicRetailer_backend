@@ -147,7 +147,7 @@ def get_user():
         return jsonify({"message": "User not found", "code": 404})
     
 # Define an endpoint for retrieving user data by id
-@app.route("/get_user/<user_id>", methods=["GET"])
+@app.route("/get_user_by_id/<user_id>", methods=["GET"])
 @jwt_required()
 def get_user_by_id(user_id):
     user = users_db.find_one({"_id": ObjectId(user_id)})
