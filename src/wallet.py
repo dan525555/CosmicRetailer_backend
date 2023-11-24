@@ -23,9 +23,8 @@ def buyItem(item_id):
     if item is None:
         return jsonify({'message': 'item not found', "code": 404})
 
-    response = requests.get("https://cosmicretailer.onrender.com/get_user_wallet/" + item['userId'])
-    if response.json['code'] != 200:
-        return jsonify({'message': response.json()['message'], "code": 404})
+    headers = {"Authorization": f"{request.headers.get('Authorization')}"}
+    response = requests.get("https://cosmicretailer.onrender.com/get_user_wallet/" + item['userId'], headers=headers)
 
     from_account = current_user['walletAddress']
     to_account = response.json()['walletAddress']
@@ -36,7 +35,8 @@ def buyItem(item_id):
     api_request = "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USDT"
     response = requests.get(api_request)
 
-    balance_usdt = balance * response['USDT']
+    balance_usdt = balance * response.json()['USDT']
+    print('balance_usdt & balance & price', balance_usdt, balance, item['price'])
 
     if balance_usdt < item['price'] + 0.1:
         return jsonify({'message': 'not enough money', "code": 400})
@@ -44,7 +44,10 @@ def buyItem(item_id):
     api_request = "https://min-api.cryptocompare.com/data/price?fsym=USDT&tsyms=ETH"
     response = requests.get(api_request)
 
-    balance_eth = item['price'] / response['ETH']
+    balance_eth = item['price'] / response.json()['ETH']
+    print('balance_eth', balance_eth)
+    print('value', web3.to_wei(balance_eth, 'ether'))
+    print('lol balance', balance / response.json()['ETH'])
     
     nonce = web3.eth.get_transaction_count(from_account)  
     tx = {

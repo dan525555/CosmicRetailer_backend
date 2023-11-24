@@ -189,11 +189,11 @@ def get_user_by_id(user_id):
     if user:
         wallet = user.get("walletAddress", '')
         if wallet == '':
-            return jsonify({"message": "User has no wallet", "code": 404})
+            return jsonify({"message": "User has no wallet", "code": 404}), 404
 
-        return jsonify({"walletAddress": wallet, "code": 200})
+        return jsonify({"walletAddress": wallet, "code": 200}), 200
     else:
-        return jsonify({"message": "User not found", "code": 404})
+        return jsonify({"message": "User not found", "code": 404}), 404
 
 @app.route("/set_wallet_address", methods=["POST"])
 def send_wallet_address():
