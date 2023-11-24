@@ -146,6 +146,40 @@ def get_user():
     else:
         return jsonify({"message": "User not found", "code": 404})
     
+# Define an endpoint for retrieving user data by id
+@app.route("/get_user/<user_id>", methods=["GET"])
+@jwt_required()
+def get_user_by_id(user_id):
+    user = users_db.find_one({"_id": ObjectId(user_id)})
+
+    if user:
+        items = user.get("items", [])
+        history = user.get("history", [])
+        ratings = user.get("ratings", [])
+        favorites = user.get("favorites", [])
+        bucket = user.get("bucket", [])
+
+        user_data = {
+            "nickname": user["nickname"],
+            "fullName": user.get("fullName", ""),
+            "email": user["email"],
+            "phone": user.get("phone", ""),
+            "address": user.get("address", {}),
+            "country": user.get("country", ""),
+            "photoUrl": user.get("photoUrl", None),
+            "rating_avg": user.get("rating_avg", 0),
+            "items": serialize_object_ids(items),
+            "history": serialize_object_ids(history),
+            "ratings": serialize_object_ids(ratings),
+            "favorites": serialize_object_ids(favorites),
+            "bucket": serialize_object_ids(bucket),
+            "walletAddress": user.get("walletAddress", '')
+        }
+
+        return jsonify({"user": user_data, "code": 200})
+    else:
+        return jsonify({"message": "User not found", "code": 404})
+    
 # Define an endpoint for retrieving user data
 @app.route("/get_user_wallet/<user_id>", methods=["GET"])
 @jwt_required()
