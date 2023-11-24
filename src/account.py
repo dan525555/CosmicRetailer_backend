@@ -149,7 +149,7 @@ def get_user():
 # Define an endpoint for retrieving user data by id
 @app.route("/get_user_by_id/<user_id>", methods=["GET"])
 @jwt_required()
-def get_user_by_id(user_id):
+def get_user_by_id2(user_id):
     user = users_db.find_one({"_id": ObjectId(user_id)})
 
     if user:
