@@ -214,3 +214,34 @@ def update_wallet_address():
         {"nickname": current_user["nickname"]}, {"$set": {"walletAddress": wallet_address}}
     )
     return jsonify({"message": "Success", "code": 200})
+
+
+
+
+@app.route("/get_history", methods=["GET"])
+@jwt_required()  # Requires a valid JWT token
+def get_history():
+    user = current_user
+    if user:
+        history = user.get("history", [])
+        return jsonify({
+            "history": serialize_object_ids(history),
+            "message": "Success",
+            "code": 200
+        })
+
+    return jsonify({"message": "User not found", "code": 404})
+
+@app.route("/get_user_items", methods=["GET"])
+@jwt_required()  # Requires a valid JWT token
+def get_user_items():
+    user = current_user
+    if user:
+        items = user.get("items", [])
+        return jsonify({
+            "items": serialize_object_ids(items),
+            "message": "Success",
+            "code": 200
+        })
+
+    return jsonify({"message": "User not found", "code": 404})
